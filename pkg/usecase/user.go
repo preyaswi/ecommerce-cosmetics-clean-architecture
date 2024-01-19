@@ -11,17 +11,19 @@ import (
 	"strconv"
 
 	"github.com/google/uuid"
+	"github.com/jinzhu/copier"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type userUseCase struct {
 	userRepo interfaces.UserRepository
-	cfg config.Config
+	cfg      config.Config
 }
 
-func NewUserUseCase(repo interfaces.UserRepository,cfg config.Config)*userUseCase  {
+func NewUserUseCase(repo interfaces.UserRepository, cfg config.Config) *userUseCase {
 	return &userUseCase{
 		userRepo: repo,
-		cfg: cfg,
+		cfg:      cfg,
 	}
 }
 
@@ -45,7 +47,7 @@ func IsValidPhoneNumber(phoneNumber string) bool {
 		return false
 	}
 }
-func(u *userUseCase) UserSignup(user models.SignupDetail) (*models.TokenUser, error) {
+func (u *userUseCase) UserSignup(user models.SignupDetail) (*models.TokenUser, error) {
 
 	if !IsEmailValid(user.Email) {
 		return &models.TokenUser{}, errors.New("invalid email format")
@@ -125,6 +127,47 @@ func(u *userUseCase) UserSignup(user models.SignupDetail) (*models.TokenUser, er
 
 	return &models.TokenUser{
 		Users:        userData,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}, nil
+
+}
+func (u *userUseCase) UserLoginWithPassword(user models.LoginDetail) (*models.TokenUser, error) {
+	email, err := u.userRepo.CheckUserExistsByEmail(user.Email)
+
+	if err != nil {
+		return &models.TokenUser{}, errors.New("error with server")
+	}
+	if email == nil {
+		return &models.TokenUser{}, errors.New("email  does not exsist")
+	}
+
+	userDetails, err := u.userRepo.FindUserDetailsByEmail(user)
+	if err != nil {
+		return &models.TokenUser{}, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(userDetails.Password), []byte(user.Password))
+
+	if err != nil {
+		return &models.TokenUser{}, errors.New("password not matching")
+	}
+	var user_details models.SignupDetailResponse
+	err = copier.Copy(&user_details, &userDetails)
+	if err != nil {
+		return &models.TokenUser{}, err
+	}
+	accessToken, err := helper.GenerateAccessToken(user_details)
+	if err != nil {
+		return &models.TokenUser{}, errors.New("could not create accesstoken due to internal error")
+	}
+	refreshToken, err := helper.GenerateRefreshToken(user_details)
+	if err != nil {
+		return &models.TokenUser{}, errors.New("counldnt create refresh token due to error")
+	}
+
+	return &models.TokenUser{
+		Users:        user_details,
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil

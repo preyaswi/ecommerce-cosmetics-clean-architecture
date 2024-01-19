@@ -58,3 +58,27 @@ func (u *UserHandler) UserSignUp(c *gin.Context) {
 	successRes := response.ClientResponse(http.StatusCreated, "User successfully signed up", userCreated, nil)
 	c.JSON(http.StatusCreated, successRes)
 }
+
+func(u *UserHandler) UserLoginWithPassword(c *gin.Context) {
+	var userLoginDetail models.LoginDetail
+	if err := c.ShouldBindJSON(&userLoginDetail); err != nil {
+		errRes := response.ClientResponse(http.StatusBadRequest, "fields provided are in wrong format", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errRes)
+		return
+	}
+	err := validator.New().Struct(userLoginDetail)
+	if err != nil {
+		errRes := response.ClientResponse(http.StatusBadRequest, "constrains not satisfied", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errRes)
+		return
+	}
+	userLoggedInWithPassword, err := u.userUseCase.UserLoginWithPassword(userLoginDetail)
+	if err != nil {
+		errRes := response.ClientResponse(http.StatusBadRequest, "fields provided are in wrong format", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errRes)
+		return
+	}
+	successRes := response.ClientResponse(http.StatusCreated, "User successfully Logged In With password", userLoggedInWithPassword, nil)
+	c.JSON(http.StatusCreated, successRes)
+
+}

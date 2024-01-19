@@ -12,4 +12,5 @@ type UserRepository interface {
 	CreateReferralEntry(userDetails models.SignupDetailResponse, userReferral string) error 
 	GetUserIdFromReferrals(ReferralCode string) (int, error)
 	UpdateReferralAmount(referralAmount float64, referredUserId int, currentUserID int) error
+	FindUserDetailsByEmail(user models.LoginDetail) (models.UserLoginResponse, error)
 }
