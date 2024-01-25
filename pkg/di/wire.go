@@ -15,6 +15,6 @@ import (
 )
 
 func InitializeAPI(cfg config.Config) (*http.ServerHTTP, error) {
-	wire.Build(db.ConnectDatabase, repository.NewuserRepository, usecase.NewUserUseCase, handler.NewUserHandler, http.NewServerHTTP)
+	wire.Build(db.ConnectDatabase, repository.NewuserRepository, usecase.NewUserUseCase, handler.NewUserHandler, http.NewServerHTTP, repository.NewProductRepository, usecase.NewProductUseCase, handler.NewProductHandler, handler.NewOtpHandler, usecase.NewOtpUseCase, repository.NewOtpRepository)
 	return &http.ServerHTTP{}, nil
 }
