@@ -14,18 +14,23 @@ func InitializeAPI(cfg config.Config) (*http.ServerHTTP, error) {
 	if err != nil {
 		return nil, err
 	}
-	userRepository := repository.NewuserRepository(gormDB)
-	userUseCase := usecase.NewUserUseCase(userRepository, cfg)
-	userHandler := handler.NewUserHandler(userUseCase)
+
 	otpRepository:=repository.NewOtprepository(gormDB)
 	otpUseCase:=usecase.NewOtpUseCase(cfg,otpRepository)
 	otpHandler := handler.NewOtpHandler(otpUseCase)
 	productRepository := repository.NewProductRepository(gormDB)
 	productUseCase := usecase.NewProductUseCase(productRepository, cfg)
 	productHandler := handler.NewProductHandler(productUseCase)
-
-
-	serverHTTP := http.NewServerHTTP(userHandler,otpHandler,productHandler)
+	cartRepository := repository.NewCartRepository(gormDB)
+	cartUseCase := usecase.NewCartUseCase(cartRepository, productRepository)
+	cartHandler := handler.NewCartHandler(cartUseCase)
+	userRepository := repository.NewuserRepository(gormDB)
+	userUseCase := usecase.NewUserUseCase(userRepository,cartRepository, cfg)
+	userHandler := handler.NewUserHandler(userUseCase)
+	orderRepository := repository.NewOrderRepository(gormDB)
+	orderUseCase := usecase.NewOrderUseCase(orderRepository, cartRepository, userRepository)
+	orderHandler := handler.NewOrderHandler(orderUseCase)
+	serverHTTP := http.NewServerHTTP(userHandler,otpHandler,productHandler,cartHandler,orderHandler)
 
 	return serverHTTP, nil
 

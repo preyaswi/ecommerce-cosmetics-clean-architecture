@@ -20,7 +20,7 @@ func NewProductUseCase(repo interfaces.ProductRepository, cfg config.Config) ser
 }
 
 func(pr *productUseCase) ShowAllProducts(page int, count int) ([]models.ProductBrief, error) {
-	productsBrief, err := pr.ShowAllProducts(page, count)
+	productsBrief, err := pr.productRepo.ShowAllProducts(page, count)
 	if err != nil {
 		return []models.ProductBrief{}, err
 	}

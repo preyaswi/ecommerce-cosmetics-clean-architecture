@@ -16,21 +16,28 @@ func NewProductRepository(DB *gorm.DB) interfaces.ProductRepository {
 	return &productDatabase{DB}
 }
 
-func (p *productDatabase) ShowAllProducts(page int, count int) ([]models.ProductBrief, error) {
+func(p *productDatabase) ShowAllProducts(page int, count int) ([]models.ProductBrief, error) {
+	if page <= 0 {
+		page = 1
+	}
 
-	productsBrief, err := p.ShowAllProducts(page, count)
+	if count <= 0 {
+		count = 5
+	}
+
+	offset := (page - 1) * count
+	var productsBrief []models.ProductBrief
+
+	err := p.DB.Raw(`
+		SELECT * FROM products limit ? offset ?
+	`, count, offset).Scan(&productsBrief).Error
+
 	if err != nil {
-		return []models.ProductBrief{}, err
+		return nil, err
 	}
-	for i := range productsBrief {
-		p := &productsBrief[i]
-		if p.Quantity == 0 {
-			p.ProductStatus = "out of stock"
-		} else {
-			p.ProductStatus = "in stock"
-		}
-	}
+
 	return productsBrief, nil
+
 }
 func (p *productDatabase)ShowIndividualProducts(id int) (*models.ProductBrief, error) {
 	var product models.ProductBrief
@@ -99,4 +106,12 @@ func(p *productDatabase) GetQuantityFromProductID(id int) (int, error) {
 
 	return quantity, nil
 
+}
+func(p *productDatabase) GetPriceOfProductFromID(prodcut_id int) (float64, error) {
+	var productPrice float64
+
+	if err := p.DB.Raw("select price from products where id = ?", prodcut_id).Scan(&productPrice).Error; err != nil {
+		return 0.0, err
+	}
+	return productPrice, nil
 }

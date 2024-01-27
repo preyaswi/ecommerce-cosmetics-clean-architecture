@@ -8,4 +8,5 @@ type ProductRepository interface {
 	CheckValidityOfCategory(data map[string]int) error
 	GetProductFromCategory(id int) ([]models.ProductBrief, error)
 	GetQuantityFromProductID(id int) (int, error)
+	GetPriceOfProductFromID(prodcut_id int) (float64, error)
 }
