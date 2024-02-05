@@ -5,6 +5,7 @@ import (
 	errorss "clean/pkg/errors"
 	"clean/pkg/helper"
 	interfaces "clean/pkg/repository/interface"
+	services "clean/pkg/usecase/interface"
 	"clean/pkg/utils/models"
 	"context"
 	"errors"
@@ -24,7 +25,7 @@ type userUseCase struct {
 }
 
 
-func NewUserUseCase(repo interfaces.UserRepository, cartRepo interfaces.CartRepository, cfg config.Config) *userUseCase {
+func NewUserUseCase(repo interfaces.UserRepository, cartRepo interfaces.CartRepository, cfg config.Config) services.UserUseCase {
 	return &userUseCase{
 		userRepo: repo,
 		cfg:      cfg,
@@ -204,13 +205,13 @@ func (u *userUseCase) UserDetails(userID int) (models.UsersProfileDetails, error
 }
 
 func (u *userUseCase) UpdateUserDetails(userDetails models.UsersProfileDetails, userID int) (models.UsersProfileDetails, error) {
-	if !IsEmailValid(userDetails.Email) {
-		return models.UsersProfileDetails{}, errors.New("invalid email format")
-	}
+	// if !IsEmailValid(userDetails.Email) {
+	// 	return models.UsersProfileDetails{}, errors.New("invalid email format")
+	// }
 
-	if !IsValidPhoneNumber(userDetails.Phone) {
-		return models.UsersProfileDetails{}, errors.New("invalid phone number format")
-	}
+	// if !IsValidPhoneNumber(userDetails.Phone) {
+	// 	return models.UsersProfileDetails{}, errors.New("invalid phone number format")
+	// }
 	userExist := u.userRepo.CheckUserAvailability(userDetails.Email)
 	// update with email that does not already exist
 	if userExist {

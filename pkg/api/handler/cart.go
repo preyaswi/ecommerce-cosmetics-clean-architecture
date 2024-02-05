@@ -18,6 +18,16 @@ func NewCartHandler(usecase services.CartUseCase) *CartHandler {
 		cartUseCase: usecase,
 	}
 }
+// @Summary Add to Cart
+// @Description Add product to the cart using product id
+// @Tags User Cart
+// @Accept json
+// @Produce json
+// @Param id path string true "product-id"
+// @Security Bearer
+// @Success 200 {object} response.Response{}
+// @Failure 500 {object} response.Response{}
+// @Router /users/cart/{id} [post]
 func(cr *CartHandler) AddToCart(c *gin.Context) {
 	id := c.Param("id")
 
@@ -39,6 +49,16 @@ func(cr *CartHandler) AddToCart(c *gin.Context) {
 	c.JSON(200, successRes)
 
 }
+// @Summary Remove product from cart
+// @Description Remove specified product of quantity 1 from cart using product id
+// @Tags User Cart
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "Product id"
+// @Success 200 {object} response.Response{}
+// @Failure 500 {object} response.Response{}
+// @Router /users/cart/{id} [delete]
 func(cr *CartHandler)  RemoveFromCart(c *gin.Context) {
 	id := c.Param("id")
 	product_id, err := strconv.Atoi(id)
@@ -63,6 +83,16 @@ func(cr *CartHandler)  RemoveFromCart(c *gin.Context) {
 	c.JSON(200, succesRes)
 
 }
+
+// @Summary Display Cart
+// @Description Display all products of the cart along with price of the product and grand total
+// @Tags User Cart
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Success 200 {object} response.Response{}
+// @Failure 500 {object} response.Response{}
+// @Router /users/cart [get]
 func (cr *CartHandler) DisplayCart(c *gin.Context) {
 
 	userID, _ := c.Get("user_id")
@@ -78,6 +108,16 @@ func (cr *CartHandler) DisplayCart(c *gin.Context) {
 	c.JSON(http.StatusOK, successRes)
 
 }
+
+// @Summary Delete all Items Present inside the Cart
+// @Description Remove all product from cart
+// @Tags User Cart
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Success 200 {object} response.Response{}
+// @Failure 500 {object} response.Response{}
+// @Router /users/cart [delete]
 func(cr *CartHandler)  EmptyCart(c *gin.Context) {
 	userID, _ := c.Get("user_id")
 	// user_ID := c.Query("user_id")

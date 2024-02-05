@@ -3,12 +3,27 @@ package main
 import (
 	"clean/pkg/config"
 	"clean/pkg/di"
+
 	"log"
 
 	"github.com/joho/godotenv"
 	"github.com/swaggo/swag/example/basic/docs"
 )
 
+// @title   Cosmetics eCommerce API
+// @version  1.0
+// @description API for ecommerce website
+
+// @securityDefinitions.apiKey Bearer
+// @in       header
+// @name      Authorization
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @host   ajay404.online
+// @BasePath  /
+
+// @schemes http
 func main() {
 
 	// // swagger 2.0 Meta Information

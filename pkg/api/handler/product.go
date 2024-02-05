@@ -18,6 +18,16 @@ func NewProductHandler(useCase services.ProductUseCase) *ProductHandler {
 		productUseCase: useCase,
 	}
 }
+// @Summary Get Products Details to users
+// @Description Retrieve all product Details with pagination to users
+// @Tags User Product
+// @Accept json
+// @Produce json
+// @Param page path string true "Page number"
+// @Param count query string true "Page Count"
+// @Success 200 {object} response.Response{}
+// @Failure 500 {object} response.Response{}
+// @Router /users/products/page/{page} [get]
 func(pr *ProductHandler) ShowAllProducts(c *gin.Context) {
 	pageStr := c.Param("page")
 
@@ -54,6 +64,16 @@ func(pr *ProductHandler) ShowAllProducts(c *gin.Context) {
 	successRes := response.ClientResponse(http.StatusOK, "Successfully Retrieved all products", products, nil)
 	c.JSON(http.StatusOK, successRes)
 }
+
+// @Summary Get Individual Product Details
+// @Description Get Individual Detailed product details to user side
+// @Tags User Product
+// @Accept json
+// @Produce json
+// @Param id path string true "idstr"
+// @Success 200 {object} response.Response{}
+// @Failure 500 {object} response.Response{}
+// @Router /users/products/{id} [get]
 func (pr *ProductHandler) ShowIndividualProducts(c *gin.Context) {
 	idstr := c.Param("id")
 	id, err := strconv.Atoi(idstr)
@@ -72,6 +92,15 @@ func (pr *ProductHandler) ShowIndividualProducts(c *gin.Context) {
 	c.JSON(http.StatusOK, successRes)
 
 }
+// @Summary Show Products of specified category
+// @Description Show all the Products belonging to a specified category
+// @Tags User Product
+// @Accept json
+// @Produce json
+// @Param data body map[string]int true "Category IDs and quantities"
+// @Success 200 {object} response.Response{}
+// @Failure 500 {object} response.Response{}
+// @Router /users/products/filter [post]
 func(pr *ProductHandler) FilterCategory(c *gin.Context) {
 
 	var data map[string]int

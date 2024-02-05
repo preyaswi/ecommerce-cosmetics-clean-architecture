@@ -4,6 +4,7 @@ import (
 	"clean/pkg/config"
 	"clean/pkg/helper"
 	interfaces "clean/pkg/repository/interface"
+	services "clean/pkg/usecase/interface"
 	"clean/pkg/utils/models"
 	"errors"
 
@@ -15,7 +16,7 @@ type otpUseCase struct {
 	otpRepository interfaces.OtpRepository
 }
 
-func NewOtpUseCase(cfg config.Config, repo interfaces.OtpRepository) *otpUseCase {
+func NewOtpUseCase(cfg config.Config, repo interfaces.OtpRepository) services.OtpUseCase {
 	return &otpUseCase{
 		cfg:           cfg,
 		otpRepository: repo,

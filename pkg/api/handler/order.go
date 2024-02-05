@@ -20,6 +20,17 @@ func NewOrderHandler(useCase services.OrderUseCase) *OrderHandler {
 		orderUseCase: useCase,
 	}
 }
+
+// @Summary Order Items from cart
+// @Description Order all products which is currently present inside  the cart
+// @Tags User Order
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param orderBody body models.OrderFromCart true "Order details"
+// @Success 200 {object} response.Response{}
+// @Failure 500 {object} response.Response{}
+// @Router /users/order [post]
 func (o *OrderHandler) OrderItemsFromCart(c *gin.Context) {
 
 	id, _ := c.Get("user_id")
@@ -43,6 +54,18 @@ func (o *OrderHandler) OrderItemsFromCart(c *gin.Context) {
 	c.JSON(http.StatusOK, successRes)
 
 }
+
+// @Summary Get Order Details to user side
+// @Description Get all order details done by user to user side
+// @Tags User Order
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "page number"
+// @Param pageSize query string true "page size"
+// @Success 200 {object} response.Response{}
+// @Failure 500 {object} response.Response{}
+// @Router /users/orders/{id} [get]
 func (o *OrderHandler) GetOrderDetails(c *gin.Context) {
 
 	pageStr := c.Param("page")
@@ -77,6 +100,17 @@ func (o *OrderHandler) GetOrderDetails(c *gin.Context) {
 	successRes := response.ClientResponse(http.StatusOK, "Full Order Details", fullOrderDetails, nil)
 	c.JSON(http.StatusOK, successRes)
 }
+
+// @Summary Cancel order
+// @Description Cancel order by the user using order ID
+// @Tags User Order
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "Order ID"
+// @Success 200 {object} response.Response{}
+// @Failure 500 {object} response.Response{}
+// @Router /users/cancel-order/{id} [put]
 func (o *OrderHandler) CancelOrder(c *gin.Context) {
 
 	orderID := c.Param("id")

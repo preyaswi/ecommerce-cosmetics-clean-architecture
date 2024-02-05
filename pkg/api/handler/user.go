@@ -23,6 +23,15 @@ func NewUserHandler(usecase services.UserUseCase) *UserHandler {
 		userUseCase: usecase,
 	}
 }
+// @Summary SignUp functionality for user
+// @Description SignUp functionality at the user side
+// @Tags User Authentication
+// @Accept json
+// @Produce json
+// @Param user body models.SignupDetail true "User Details Input"
+// @Success 200 {object} response.Response{}
+// @Failure 500 {object} response.Response{}
+// @Router /users/signup [post]
 func (u *UserHandler) UserSignUp(c *gin.Context) {
 	var userSignup models.SignupDetail
 	if err := c.ShouldBindJSON(&userSignup); err != nil {
@@ -61,6 +70,15 @@ func (u *UserHandler) UserSignUp(c *gin.Context) {
 	c.JSON(http.StatusCreated, successRes)
 }
 
+// @Summary LogIn functionality for user
+// @Description LogIn functionality at the user side
+// @Tags User Authentication
+// @Accept json
+// @Produce json
+// @Param user body models.LoginDetail true "User Details Input"
+// @Success 200 {object} response.Response{}
+// @Failure 500 {object} response.Response{}
+// @Router /users/login[post]
 func (u *UserHandler) UserLoginWithPassword(c *gin.Context) {
 	var userLoginDetail models.LoginDetail
 	if err := c.ShouldBindJSON(&userLoginDetail); err != nil {
@@ -84,6 +102,15 @@ func (u *UserHandler) UserLoginWithPassword(c *gin.Context) {
 	c.JSON(http.StatusCreated, successRes)
 
 }
+// @Summary Get all address for the user
+// @Description Display all the added user addresses
+// @Tags User Profile
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Success 200 {object} response.Response{}
+// @Failure 500 {object} response.Response{}
+// @Router /users/address [get]
 func (u *UserHandler) GetAllAddress(c *gin.Context) {
 
 	userID, _ := c.Get("user_id")
@@ -102,6 +129,16 @@ func (u *UserHandler) GetAllAddress(c *gin.Context) {
 	c.JSON(http.StatusOK, successRes)
 
 }
+// @Summary AddAddress functionality for user
+// @Description AddAddress functionality at the user side
+// @Tags User Profile
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param address body models.AddressInfo true "User Address Input"
+// @Success 200 {object} response.Response{}
+// @Failure 500 {object} response.Response{}
+// @Router /users/address [post]
 func (u *UserHandler) AddAddress(c *gin.Context) {
 	userID, _ := c.Get("user_id")
 
@@ -132,6 +169,18 @@ func (u *UserHandler) AddAddress(c *gin.Context) {
 	c.JSON(200, SuccessRes)
 
 }
+
+// @Summary Update User Address
+// @Description Update User address by sending in address id
+// @Tags User Profile
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "address id"
+// @Param address body models.AddressInfo true "User Address Input"
+// @Success 200 {object} response.Response{}
+// @Failure 500 {object} response.Response{}
+// @Router /users/address/{id} [put]
 func (u *UserHandler) UpdateAddress(c *gin.Context) {
 
 	id := c.Param("id")
@@ -166,6 +215,16 @@ func (u *UserHandler) UpdateAddress(c *gin.Context) {
 	c.JSON(http.StatusCreated, successRes)
 
 }
+
+// @Summary User Details
+// @Description User Details from User Profile
+// @Tags User Profile
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Success 200 {object} response.Response{}
+// @Failure 500 {object} response.Response{}
+// @Router /users/users [get]
 func (u *UserHandler) UserDetails(c *gin.Context) {
 
 	userID, _ := c.Get("user_id")
@@ -181,6 +240,17 @@ func (u *UserHandler) UserDetails(c *gin.Context) {
 	c.JSON(http.StatusOK, successRes)
 
 }
+
+// @Summary Update User details
+// @Description Update User details
+// @Tags User Profile
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param body body models.UsersProfileDetails true "User detail update"
+// @Success 200 {object} response.Response{}
+// @Failure 500 {object} response.Response{}
+// @Router /users/users [put]
 func (u *UserHandler) UpdateUserDetails(c *gin.Context) {
 
 	user_id, _ := c.Get("user_id")
@@ -204,6 +274,16 @@ func (u *UserHandler) UpdateUserDetails(c *gin.Context) {
 	c.JSON(http.StatusOK, successRes)
 
 }
+// @Summary Update User Password
+// @Description Update User Password
+// @Tags User Profile
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param body body models.UpdatePassword true "User Password update"
+// @Success 200 {object} response.Response{}
+// @Failure 500 {object} response.Response{}
+// @Router /users/users/update-password [put]
 func (u *UserHandler) UpdatePassword(c *gin.Context) {
 	user_id, _ := c.Get("user_id")
 	ctx := context.Background()
@@ -226,6 +306,16 @@ func (u *UserHandler) UpdatePassword(c *gin.Context) {
 	successRes := response.ClientResponse(http.StatusCreated, "Password updated successfully", nil, nil)
 	c.JSON(http.StatusCreated, successRes)
 }
+// @Summary Add to Wishlist
+// @Description Add To wish List
+// @Tags User Profile
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "product id"
+// @Success 200 {object} response.Response{}
+// @Failure 500 {object} response.Response{}
+// @Router /users/wishlist/{id} [get]
 func (u *UserHandler)AddWishList(c *gin.Context) {
 	userID, _ := c.Get("user_id")
 	productId := c.Param("id")
@@ -248,6 +338,15 @@ func (u *UserHandler)AddWishList(c *gin.Context) {
 	successRes := response.ClientResponse(http.StatusOK, "SuccessFully product added to wishlist", nil, nil)
 	c.JSON(http.StatusOK, successRes)
 }
+// @Summary Display Wishlist
+// @Description Display wish List
+// @Tags User Profile
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Success 200 {object} response.Response{}
+// @Failure 500 {object} response.Response{}
+// @Router /users/wishlist [get]
 func(u *UserHandler) GetWishList(c *gin.Context) {
 
 	userID, _ := c.Get("user_id")
@@ -263,6 +362,16 @@ func(u *UserHandler) GetWishList(c *gin.Context) {
 	c.JSON(http.StatusOK, successRes)
 
 }
+// @Summary Add to Wishlist
+// @Description Add To wish List
+// @Tags User Profile
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "product id"
+// @Success 200 {object} response.Response{}
+// @Failure 500 {object} response.Response{}
+// @Router /users/wishlist/{id} [delete]
 func(u *UserHandler) RemoveFromWishlist(c *gin.Context) {
 	userId, _ := c.Get("user_id")
 	productId := c.Param("id")
