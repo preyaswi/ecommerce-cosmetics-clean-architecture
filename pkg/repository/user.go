@@ -15,7 +15,9 @@ type userDatabase struct {
 }
 
 func NewuserRepository(DB *gorm.DB) interfaces.UserRepository {
-	return &userDatabase{DB}
+	return &userDatabase{
+		DB: DB,
+	}
 
 }
 func (c *userDatabase) CheckUserExistsByEmail(email string) (*domain.User, error) {
@@ -42,9 +44,14 @@ func (c *userDatabase) CheckUserExistsByPhone(phone string) (*domain.User, error
 }
 func (c *userDatabase) UserSignup(user models.SignupDetail) (models.SignupDetailResponse, error) {
 	var signupDetail models.SignupDetailResponse
-	err := c.DB.Raw("INSERT INTO users(firstname,lastname,email,password,phone)VALUES(?,?,?,?,?)RETURNING id,firstname,lastname,email,phone", user.Firstname, user.Lastname, user.Email, user.Password, user.Phone).Scan(&signupDetail).Error
+	err := c.DB.Raw(`
+		INSERT INTO users(firstname, lastname, email, password, phone)
+		VALUES(?, ?, ?, ?, ?)
+		RETURNING id, firstname, lastname, email, phone
+	`, user.Firstname, user.Lastname, user.Email, user.Password, user.Phone).
+		Scan(&signupDetail).Error
+		
 	if err != nil {
-		fmt.Println("Repository error:", err)
 		return models.SignupDetailResponse{}, err
 	}
 	return signupDetail, nil
@@ -131,16 +138,16 @@ func (c *userDatabase) UpdateAddress(address models.AddressInfo, addressID int, 
 	return addressResponse, nil
 
 }
-func(c *userDatabase) UserDetails(userID int) (models.UsersProfileDetails, error) {
+func (c *userDatabase) UserDetails(userID int) (models.UsersProfileDetails, error) {
 
 	var userDetails models.UsersProfileDetails
 	err := c.DB.Raw("select users.firstname,users.lastname,users.email,users.phone from users  where users.id = ?", userID).Row().Scan(&userDetails.Firstname, &userDetails.Lastname, &userDetails.Email, &userDetails.Phone)
 	if err != nil {
-		return models.UsersProfileDetails{}, err
+		return models.UsersProfileDetails{}, errors.New("could not get user details")
 	}
 	return userDetails, nil
 }
-func(c *userDatabase)  CheckUserAvailability(email string) bool {
+func (c *userDatabase) CheckUserAvailability(email string) bool {
 
 	var count int
 	query := fmt.Sprintf("select count(*) from users where email='%s'", email)
@@ -151,7 +158,7 @@ func(c *userDatabase)  CheckUserAvailability(email string) bool {
 	return count > 0
 
 }
-func(c *userDatabase) UpdateUserEmail(email string, userID int) error {
+func (c *userDatabase) UpdateUserEmail(email string, userID int) error {
 
 	err := c.DB.Exec("update users set email = ? where id = ?", email, userID).Error
 	if err != nil {
@@ -161,7 +168,7 @@ func(c *userDatabase) UpdateUserEmail(email string, userID int) error {
 
 }
 
-func(c *userDatabase) UpdateUserPhone(phone string, userID int) error {
+func (c *userDatabase) UpdateUserPhone(phone string, userID int) error {
 
 	err := c.DB.Exec("update users set phone = ? where id = ?", phone, userID).Error
 	if err != nil {
@@ -171,7 +178,7 @@ func(c *userDatabase) UpdateUserPhone(phone string, userID int) error {
 
 }
 
-func(c *userDatabase) UpdateFirstName(name string, userID int) error {
+func (c *userDatabase) UpdateFirstName(name string, userID int) error {
 
 	err := c.DB.Exec("update users set firstname = ? where id = ?", name, userID).Error
 	if err != nil {
@@ -180,7 +187,7 @@ func(c *userDatabase) UpdateFirstName(name string, userID int) error {
 	return nil
 
 }
-func(c *userDatabase) UpdateLastName(name string, userID int) error {
+func (c *userDatabase) UpdateLastName(name string, userID int) error {
 
 	err := c.DB.Exec("update users set lastname = ? where id = ?", name, userID).Error
 	if err != nil {
@@ -189,7 +196,7 @@ func(c *userDatabase) UpdateLastName(name string, userID int) error {
 	return nil
 
 }
-func(c *userDatabase) UserPassword(userID int) (string, error) {
+func (c *userDatabase) UserPassword(userID int) (string, error) {
 
 	var userPassword string
 	err := c.DB.Raw("select password from users where id = ?", userID).Scan(&userPassword).Error
@@ -199,7 +206,7 @@ func(c *userDatabase) UserPassword(userID int) (string, error) {
 	return userPassword, nil
 
 }
-func(c *userDatabase) UpdateUserPassword(password string, userID int) error {
+func (c *userDatabase) UpdateUserPassword(password string, userID int) error {
 	err := c.DB.Exec("update users set password = ? where id = ?", password, userID).Error
 	if err != nil {
 		return err
@@ -207,7 +214,7 @@ func(c *userDatabase) UpdateUserPassword(password string, userID int) error {
 	fmt.Println("password Updated succesfully")
 	return nil
 }
-func(c *userDatabase) CheckProductExist(pid int) (bool, error) {
+func (c *userDatabase) CheckProductExist(pid int) (bool, error) {
 	var k int
 	err := c.DB.Raw("SELECT COUNT(*) FROM products WHERE id=?", pid).Scan(&k).Error
 	if err != nil {
@@ -220,7 +227,7 @@ func(c *userDatabase) CheckProductExist(pid int) (bool, error) {
 
 	return true, err
 }
-func(c *userDatabase) ProductExistInWishList(productID int, userID int) (bool, error) {
+func (c *userDatabase) ProductExistInWishList(productID int, userID int) (bool, error) {
 
 	var count int
 	err := c.DB.Raw("select count(*) from wish_lists where user_id = ? and product_id = ? ", userID, productID).Scan(&count).Error
@@ -231,7 +238,7 @@ func(c *userDatabase) ProductExistInWishList(productID int, userID int) (bool, e
 	return count > 0, nil
 
 }
-func(c *userDatabase) AddToWishList(userID int, productID int) error {
+func (c *userDatabase) AddToWishList(userID int, productID int) error {
 	err := c.DB.Exec("insert into wish_lists (user_id,product_id) values (?, ?)", userID, productID).Error
 	if err != nil {
 		return err
@@ -240,7 +247,7 @@ func(c *userDatabase) AddToWishList(userID int, productID int) error {
 	return nil
 }
 
-func(c *userDatabase) GetWishList(userId int) ([]models.WishListResponse, error) {
+func (c *userDatabase) GetWishList(userId int) ([]models.WishListResponse, error) {
 	var wishList []models.WishListResponse
 	err := c.DB.Raw("select products.id as product_id,products.name as product_name,products.price as product_price from products inner join wish_lists on products.id=wish_lists.product_id where wish_lists.user_id=?", userId).Scan(&wishList).Error
 	if err != nil {
@@ -248,7 +255,7 @@ func(c *userDatabase) GetWishList(userId int) ([]models.WishListResponse, error)
 	}
 	return wishList, nil
 }
-func(c *userDatabase) RemoveFromWishlist(userID int, productId int) error {
+func (c *userDatabase) RemoveFromWishlist(userID int, productId int) error {
 	err := c.DB.Exec("delete from wish_lists where user_id=? and product_id =?", userID, productId).Error
 	if err != nil {
 		return err
@@ -257,7 +264,7 @@ func(c *userDatabase) RemoveFromWishlist(userID int, productId int) error {
 	return nil
 }
 
-func(c *userDatabase) GetAllAddresses(userID int) ([]models.AddressInfoResponse, error) {
+func (c *userDatabase) GetAllAddresses(userID int) ([]models.AddressInfoResponse, error) {
 
 	var addressResponse []models.AddressInfoResponse
 	err := c.DB.Raw(`select * from addresses where user_id = $1`, userID).Scan(&addressResponse).Error
@@ -269,7 +276,7 @@ func(c *userDatabase) GetAllAddresses(userID int) ([]models.AddressInfoResponse,
 
 }
 
-func(c *userDatabase)  GetAllPaymentOption() ([]models.PaymentDetails, error) {
+func (c *userDatabase) GetAllPaymentOption() ([]models.PaymentDetails, error) {
 
 	var paymentMethods []models.PaymentDetails
 	err := c.DB.Raw("select * from payment_methods").Scan(&paymentMethods).Error

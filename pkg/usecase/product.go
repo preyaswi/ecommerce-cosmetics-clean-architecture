@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"clean/pkg/config"
 	interfaces "clean/pkg/repository/interface"
 	services "clean/pkg/usecase/interface"
 	"clean/pkg/utils/models"
@@ -9,13 +8,11 @@ import (
 
 type productUseCase struct {
 	productRepo interfaces.ProductRepository
-	cfg         config.Config
 }
 
-func NewProductUseCase(repo interfaces.ProductRepository, cfg config.Config) services.ProductUseCase {
+func NewProductUseCase(repo interfaces.ProductRepository) services.ProductUseCase {
 	return &productUseCase{
 		productRepo: repo,
-		cfg:         cfg,
 	}
 }
 

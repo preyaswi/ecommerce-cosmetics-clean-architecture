@@ -1,0 +1,18 @@
+basePath: /
+info:
+  contact: {}
+  description: API for ecommerce website
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Cosmetics eCommerce API
+  version: "1.0"
+paths: {}
+schemes:
+- http
+securityDefinitions:
+  Bearer:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

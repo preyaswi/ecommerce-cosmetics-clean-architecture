@@ -29,4 +29,5 @@ type CartRepository interface {
 	GetAllItemsFromCart(userID int) ([]models.Cart, error)
 	GetTotalPriceFromCart(userID int) (float64, error)
 	
+	
 }
