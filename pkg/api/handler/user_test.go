@@ -48,7 +48,7 @@ func Test_UserSignup(t *testing.T) {
 					AccessToken:  "adfsae.thjjshahfiurhf.ajherkuefeu",
 					RefreshToken: "fkdgker.jrijigsiejggj.rlisjgjisg3",
 				}, nil)
-			},
+			}, 
 			checkResponse: func(t *testing.T, responseRecorder *httptest.ResponseRecorder) {
 				assert.Equal(t, http.StatusCreated, responseRecorder.Code)
 			},
