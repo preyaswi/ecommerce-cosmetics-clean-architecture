@@ -66,7 +66,7 @@ func Test_UserSignup(t *testing.T) {
 				// copying signupData to domain.user for pass to Mock usecase
 				err := validator.New().Struct(signupData)
 				if err != nil {
-					fmt.Println("validation failed")
+					fmt.Println("validation failed")  
 				}
 
 				useCaseMock.EXPECT().UserSignup(signupData).Times(1).Return(&models.TokenUser{}, errors.New("cannot sign up"))
