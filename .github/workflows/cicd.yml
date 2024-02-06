@@ -1,28 +1,76 @@
-name: CI CD -cosmetics
+name: CI-STAGING-ecommerce
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+      branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Image version'
+        required: true
+
+env:
+          IMAGE_NAME: api
+          REPO: preyaswi
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.21.5
-
-      - name: Install Make
-        run: |
-          sudo apt update
-          sudo apt install -y make
-      # testing
-      - name: Test
-        run: make test
+            build-and-deploy:
+              name: Build, Push, and Deploy Backend Docker Image
+              runs-on: ubuntu-latest
+              steps:
+                - name: Checkout
+                  uses: actions/checkout@v3
+                - name: Set up QEMU
+                  uses: docker/setup-qemu-action@v2
+                - name: Testing
+                  run: go test -v ./...
+                - name: Set up Docker Buildx
+                  uses: docker/setup-buildx-action@v2
+                - name: Login to DockerHub
+                  uses: docker/login-action@v2
+                  with:
+                    username: ${{ secrets.DOCKERHUB_USERNAME }}
+                    password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          
+                - name: Generate short SHA and store it as an environment variable
+                  run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          
+                - name: Build and push Docker image
+                  uses: docker/build-push-action@v3
+                  with:
+                    context: .
+                    push: true
+                    tags: |
+                      test/${{ env.IMAGE_NAME }}:${{ env.SHORT_SHA }}
+                      test/${{ env.IMAGE_NAME }}:latest
+                  continue-on-error: false  # Stop the workflow if this step fails
+                - name: Deploy to AWS EC2
+                  uses: appleboy/ssh-action@master
+                  with:
+                        host: ${{ secrets.AWS_HOST }}
+                        username: ${{ secrets.AWS_USERNAME }}
+                        key: ${{ secrets.AWS_SSH_KEY }}
+                        port: ${{ secrets.AWS_SSH_PORT }}
+                        script: |
+                          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+                          
+                          # Stop and remove existing container
+                          if [ "$(docker ps -q -f name=${{ env.REPO }})" ]; then
+                            docker stop ${{ env.REPO }}
+                            docker rm ${{ env.REPO }}
+                          fi
+                
+                          # Remove existing image
+                          if [ "$(docker images -q ${{env.REPO}}/${{ env.IMAGE_NAME }})" ]; then
+                            docker rmi -f ${{env.REPO}}/${{ env.IMAGE_NAME }}
+                          fi
+                          
+                          # Run the new container
+                          docker run -p 3000:3000 -d \
+                            --restart always \
+                            --env-file=.env \
+                            --name ${{env.REPO}} \
+                            ${{env.REPO}}/${{ env.IMAGE_NAME }}
+                            
