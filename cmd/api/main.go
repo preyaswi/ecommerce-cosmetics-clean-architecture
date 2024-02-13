@@ -35,7 +35,7 @@ func main() {
 	docs.SwaggerInfo.Schemes = []string{"http"} 
 
 	err := godotenv.Load()
-	if err != nil {
+	if err != nil { 
 		log.Fatal("error loading the env file")
 	}
 	config, configErr := config.LoadConfig()
