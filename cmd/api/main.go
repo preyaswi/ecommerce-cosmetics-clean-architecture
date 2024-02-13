@@ -32,7 +32,7 @@ func main() {
 	docs.SwaggerInfo.Version = "1.0"
 	docs.SwaggerInfo.Host = "localhost:3000"
 	docs.SwaggerInfo.BasePath = ""
-	docs.SwaggerInfo.Schemes = []string{"http"}
+	docs.SwaggerInfo.Schemes = []string{"http"} 
 
 	err := godotenv.Load()
 	if err != nil {
