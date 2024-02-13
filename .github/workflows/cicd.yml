@@ -52,7 +52,7 @@ jobs:
                         host: ${{ secrets.AWS_HOST }}
                         username: ${{ secrets.AWS_USERNAME }}
                         key: ${{ secrets.AWS_SSH_KEY }}
-                        port: ${{ secrets.AWS_SSH_PORT }}
+                
                         script: |
                           docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
                           
