@@ -9,6 +9,5 @@ RUN go build -v -o /app/build/api ./cmd/api
 FROM gcr.io/distroless/static-debian11
 COPY --from=build-stage /app/build/api /api
 COPY --from=build-stage /app/templates /templates
-COPY --from=build-stage /app/.env /
 EXPOSE 3000
 CMD ["/api"]
