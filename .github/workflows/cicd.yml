@@ -43,8 +43,8 @@ jobs:
                     context: .
                     push: true
                     tags: |
-                      test/${{ env.IMAGE_NAME }}:${{ env.SHORT_SHA }}
-                      test/${{ env.IMAGE_NAME }}:latest
+                      preyaswi/${{ env.IMAGE_NAME }}:${{ env.SHORT_SHA }}
+                      preyaswi/${{ env.IMAGE_NAME }}:latest
                   continue-on-error: false  # Stop the workflow if this step fails
                 - name: Deploy to AWS EC2
                   uses: appleboy/ssh-action@master
