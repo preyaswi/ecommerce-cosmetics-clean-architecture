@@ -1,12 +1,23 @@
-FROM golang:1.21.2-alpine3.18 AS build-stage
+# syntax=docker/dockerfile:1
+FROM golang:1.21.5 AS build-stage
+
 WORKDIR /app
-COPY ./ /app
-RUN mkdir -p /app/build
+
+COPY go.mod ./
 RUN go mod download
-RUN go build -v -o /app/build/api ./cmd/api
 
+COPY . .
 
-FROM gcr.io/distroless/static-debian11
-COPY --from=build-stage /app/build/api /api
+RUN CGO_ENABLED=0 GOOS=linux go build -o /api ./cmd/api
+
+FROM gcr.io/distroless/base-debian11 AS build-release-stage
+
+WORKDIR /app
+
+COPY --from=build-stage /api /api
+
 EXPOSE 3000
+
+USER nonroot:nonroot
+
 CMD ["/api"]
