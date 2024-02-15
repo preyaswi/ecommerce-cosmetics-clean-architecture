@@ -29,7 +29,15 @@ services:
       - mydb
     ports:
       - "3000:3000"
-
+  nginx:
+    image: nginx
+    restart: always
+    networks:
+      - mydb
+    ports:
+      - "80:80"  
+    depends_on:
+      zeecosmetics
 volumes:
   database-postgres:
 
