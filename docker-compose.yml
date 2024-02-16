@@ -17,12 +17,8 @@ services:
   zeecosmetics:
     image: api
     restart: on-failure
-    environment:
-      DB_HOST: "postgres"
-      DB_NAME: "preya"
-      DB_USER: "postgres"
-      DB_PORT: "5432"
-      DB_PASSWORD: "preya"
+    env_file:
+      - .env
     depends_on:
       - postgres
     networks:
