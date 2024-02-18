@@ -4,7 +4,7 @@ FROM golang:1.21.5 AS build-stage
 WORKDIR /app
 
 COPY go.mod ./
-RUN go mod download
+RUN go mod download 
 
 COPY . .
 
