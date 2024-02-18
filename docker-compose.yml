@@ -1,42 +1,44 @@
-version: "3.8"
+version: '3.9'
 services:
-  postgres:
-    image: postgres
-    restart: always
-    environment:
-       POSTGRES_USER: postgres
-       POSTGRES_PASSWORD: preya
-       POSTGRES_DB: preya
-    networks:
-      - mydb
-    volumes:
-      - database-postgres:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-
-  zeecosmetics:
-    image: api
-    restart: on-failure
+  app:
+    container_name: golang_container
     env_file:
       - .env
-    depends_on:
-      - postgres
-    networks:
-      - mydb
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - DATABASE_HOST=${DB_HOST}
+      - DATABASE_PORT=${DB_PORT}
+    tty: true
+    build: .
     ports:
-      - "3000:3000"
-  nginx:
-    image: nginx
-    restart: always
-    networks:
-      - mydb
-    ports:
-      - "80:80"  
+      - 8080:8080
+    restart: on-failure
+    volumes:
+      - .:/app
     depends_on:
-      zeecosmetics
+      - postgresdb
+    networks:
+      - learning
+  postgresdb:
+    image: postgres:latest
+    container_name: postgres_container
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - DATABASE_HOST=${DB_HOST}
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./pg_data:/var/lib/postgresql/data
+    networks:
+      - learning
 volumes:
-  database-postgres:
-
+  pg_data:
 networks:
-  mydb:
+  learning:
     driver: bridge

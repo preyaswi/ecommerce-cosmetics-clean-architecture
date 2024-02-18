@@ -15,9 +15,8 @@ FROM gcr.io/distroless/base-debian11 AS build-release-stage
 WORKDIR /app
 
 COPY --from=build-stage /api /api
-
 EXPOSE 3000
 
 USER nonroot:nonroot
 
-CMD ["/api"]
+ENTRYPOINT [ "/api" ]

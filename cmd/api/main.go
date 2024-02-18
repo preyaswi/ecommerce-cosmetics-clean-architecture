@@ -6,7 +6,6 @@ import (
 
 	"log"
 
-	"github.com/joho/godotenv"
 	"github.com/swaggo/swag/example/basic/docs"
 )
 
@@ -20,7 +19,7 @@ import (
 
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-// @host   
+// @host
 // @BasePath  /
 
 // @schemes http
@@ -34,10 +33,6 @@ func main() {
 	docs.SwaggerInfo.BasePath = ""
 	docs.SwaggerInfo.Schemes = []string{"http"} 
 
-	err := godotenv.Load()
-	if err != nil { 
-		log.Fatal("error  loading the env file")
-	}
 	config, configErr := config.LoadConfig()
 	if configErr != nil {
 		log.Fatal("cannot load config:", configErr)
