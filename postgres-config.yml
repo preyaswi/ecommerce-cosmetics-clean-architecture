@@ -3,5 +3,8 @@ kind: ConfigMap
 metadata:
   name: postgres-congifmap
 data:
+  postgres-password: preyaswi
   postgres-host: postgres-service
+  postgre-db: postgres
+  postgres-user: postgres
   postgres-port: "5432"
